@@ -2,32 +2,74 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
+const formatMessage = require('./utils/message.js');
+const {
+	userJoin,
+	getCurrentUser,
+	userLeave,
+	getRoomUsers,
+} = require('./utils/users');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-// set static folder
-
+// Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Run when a clietn connects
+const botName = 'Chat Buddy Bot';
+
+// Run when client connects
 io.on('connection', (socket) => {
-	// console.log('new ws connectiion');
+	socket.on('joinRoom', ({ username, room }) => {
+		const user = userJoin(socket.id, username, room);
 
-	// welcome current user
-	socket.emit('message', 'Welcome to Chat Buddy');
+		socket.join(user.room);
 
-	// notify to the current user that another user just connects
-	socket.broadcast.emit('message', 'A user just joined the chat');
+		// Welcome current user
+		socket.emit('message', formatMessage(botName, 'Welcome to Chat Buddy!'));
 
-	// this runs when client disconnects
+		// Broadcast when a user connects
+		socket.broadcast
+			.to(user.room)
+			.emit(
+				'message',
+				formatMessage(botName, `${user.username} has joined the chat`),
+			);
+
+		// Send users and room info
+		io.to(user.room).emit('roomUsers', {
+			room: user.room,
+			users: getRoomUsers(user.room),
+		});
+	});
+
+	// Listen for chatMessage
+	socket.on('chatMessage', (msg) => {
+		const user = getCurrentUser(socket.id);
+
+		io.to(user.room).emit('message', formatMessage(user.username, msg));
+	});
+
+	// Runs when client disconnects
 	socket.on('disconnect', () => {
-		io.emit('message', 'A user has left the chat :(');
+		const user = userLeave(socket.id);
+
+		if (user) {
+			io.to(user.room).emit(
+				'message',
+				formatMessage(botName, `${user.username} has left the chat`),
+			);
+
+			// Send users and room info
+			io.to(user.room).emit('roomUsers', {
+				room: user.room,
+				users: getRoomUsers(user.room),
+			});
+		}
 	});
 });
 
 const PORT = 3000 || process.env.PORT;
-server.listen(PORT, () => {
-	console.log(`server running on ${PORT}`);
-});
+
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

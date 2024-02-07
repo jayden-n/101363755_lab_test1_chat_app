@@ -1,11 +1,9 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Protest+Riot&display=swap');
 
 :root {
-	--dark-color-a: #0284c7;
-	--dark-color-b: #0ea5e9;
+	--dark-color-a: #d97706;
+	--dark-color-b: #f59e0b;
 	--light-color: #e6e9ff;
-	--success-color: #5cb85c;
-	--error-color: #d9534f;
 }
 
 * {
@@ -15,7 +13,7 @@
 }
 
 body {
-	font-family: 'Roboto', sans-serif;
+	font-family: 'Protest Riot', sans-serif;
 	font-size: 16px;
 	background: var(--light-color);
 	margin: 20px;
@@ -91,13 +89,13 @@ a {
 }
 
 .chat-messages {
-	padding: 30px;
+	padding: 20px;
 	max-height: 500px;
 	overflow-y: scroll;
 }
 
 .chat-messages .message {
-	padding: 10px;
+	padding: 20px;
 	margin-bottom: 15px;
 	background-color: var(--light-color);
 	border-radius: 5px;
@@ -112,6 +110,7 @@ a {
 }
 
 .chat-messages .message .meta span {
+	margin-left: 5px;
 	color: #777;
 }
 
