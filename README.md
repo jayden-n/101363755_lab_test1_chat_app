@@ -1,6 +1,6 @@
 # Chat Buddy
 > [!NOTE]
-> Basic real-time chat app with room choices
+> Real-time chat app with room choices
 
 
 
